@@ -5,34 +5,23 @@ import { combineReducers } from "redux";
 import contactsReducer from "./contactsSlice";
 import filtersReducer from "./filtersSlice";
 
-import {
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-
 const persistConfig = {
-  key: "root",
+  key: "contacts",
   storage,
-  whitelist: ["contacts"], 
+  whitelist: ["items"],
 };
 
 const rootReducer = combineReducers({
-  contacts: contactsReducer,
+  contacts: persistReducer(persistConfig, contactsReducer),
   filters: filtersReducer,
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     }),
 });

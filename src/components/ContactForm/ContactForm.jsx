@@ -1,26 +1,50 @@
-import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import styles from "./ContactForm.module.css";
 
 const ContactForm = () => {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      number: "",
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(3, "Must be at least 3 characters")
+        .max(50, "Must be 50 characters or less")
+        .required("Required"),
+      number: Yup.string()
+        .matches(
+          /^\d{3}-\d{2}-\d{2}$/,
+          "Phone number must be in xxx-xx-xx format"
+        )
+        .required("Required"),
+    }),
+    onSubmit: (values, { resetForm }) => {
+      dispatch(addContact(values.name, values.number));
+      resetForm();
+    },
+  });
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={styles.form} onSubmit={formik.handleSubmit}>
       <label className={styles.label} htmlFor="name">
         Name
       </label>
       <input
         className={styles.input}
         id="name"
+        name="name"
         type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        {...formik.getFieldProps("name")}
       />
+      {formik.touched.name && formik.errors.name ? (
+        <div className={styles.error}>{formik.errors.name}</div>
+      ) : null}
 
       <label className={styles.label} htmlFor="number">
         Number
@@ -28,11 +52,14 @@ const ContactForm = () => {
       <input
         className={styles.input}
         id="number"
+        name="number"
         type="text"
-        value={number}
-        onChange={(e) => setNumber(e.target.value)}
         placeholder="xxx-xx-xx"
+        {...formik.getFieldProps("number")}
       />
+      {formik.touched.number && formik.errors.number ? (
+        <div className={styles.error}>{formik.errors.number}</div>
+      ) : null}
 
       <button type="submit" className={styles.button}>
         Add contact

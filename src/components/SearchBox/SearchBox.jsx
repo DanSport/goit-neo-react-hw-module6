@@ -6,21 +6,22 @@ const SearchBox = () => {
   const dispatch = useDispatch();
   const filter = useSelector(selectNameFilter);
 
-  const handleChange = (e) => {
-    dispatch(changeFilter(e.target.value)); 
+  const handleFilterChange = (e) => {
+    dispatch(changeFilter(e.target.value));
   };
 
   return (
     <div className={styles.searchBox}>
-      <label className={styles.label}>
+      <label className={styles.label} htmlFor="filter">
         Find contacts by name
-        <input
-          type="text"
-          value={filter}
-          onChange={handleChange}
-          className={styles.input}
-        />
       </label>
+      <input
+        className={styles.input}
+        id="filter"
+        type="text"
+        value={filter}
+        onChange={handleFilterChange}
+      />
     </div>
   );
 };
